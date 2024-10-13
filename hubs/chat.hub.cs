@@ -85,11 +85,6 @@ namespace SignalRChat.Hubs
             {
                 if (GroupMessages.TryGetValue(group, out var groupMessages))
                 {
-                    Console.WriteLine($"Sending {groupMessages.Count} messages to {Context.ConnectionId}.");
-                    foreach (var (User, Message, SentAt) in groupMessages)
-                    {
-                        Console.WriteLine($"Message: {User} - {Message} - {SentAt}");
-                    }
                     await Clients.Caller.SendAsync("GroupMessages", groupMessages.ToArray());
                 }
                 else
