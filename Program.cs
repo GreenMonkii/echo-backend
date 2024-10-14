@@ -7,7 +7,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://thrush-maximum-bedbug.ngrok-free.app")
+        policy.WithOrigins("http://localhost:3000", "https://echo-anonymous-chat.vercel.app")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();

@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin\\Release\\net8.0\\publish",
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/bd5b468f-72e6-4d1f-b139-7bcd6e65c627/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/greenmonkii-echo-backend"
+}
