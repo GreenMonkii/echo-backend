@@ -7,7 +7,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://echo-anonymous-chat.vercel.app")
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                           ?? ["http://localhost:3000"];
+
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -15,7 +18,15 @@ builder.Services.AddCors(options =>
 });
 
 // Add SignalR services to the application
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+    options.KeepAliveInterval = TimeSpan.FromSeconds(30);
+});
+
+// Add health checks
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -24,6 +35,9 @@ app.UseCors("CorsPolicy");
 
 // Map the root endpoint to return a welcome message
 app.MapGet("/", () => "Welcome to the Echo Server! Please use a SignalR client to connect.");
+
+// Add health check endpoint
+app.MapHealthChecks("/health");
 
 // Map the SignalR hub endpoint
 app.MapHub<ChatHub>("/chat");
