@@ -167,7 +167,16 @@ namespace SignalRChat.Hubs
         // Connection lifecycle management
         public override async Task OnConnectedAsync()
         {
-            _logger.LogInformation("Client {ConnectionId} connected", Context.ConnectionId);
+            _logger.LogInformation("Client {ConnectionId} connected from {UserAgent}",
+                Context.ConnectionId, Context.GetHttpContext()?.Request.Headers.UserAgent);
+
+            // Send initial connection confirmation
+            await Clients.Caller.SendAsync("Connected", new
+            {
+                ConnectionId = Context.ConnectionId,
+                ServerTime = DateTime.UtcNow
+            });
+
             await base.OnConnectedAsync();
         }
 
@@ -175,14 +184,21 @@ namespace SignalRChat.Hubs
         {
             if (exception != null)
             {
-                _logger.LogWarning(exception, "Client {ConnectionId} disconnected with error", Context.ConnectionId);
+                _logger.LogWarning(exception, "Client {ConnectionId} disconnected with error: {ErrorMessage}",
+                    Context.ConnectionId, exception.Message);
             }
             else
             {
-                _logger.LogInformation("Client {ConnectionId} disconnected", Context.ConnectionId);
+                _logger.LogInformation("Client {ConnectionId} disconnected gracefully", Context.ConnectionId);
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        // Add a ping method to help with connection health
+        public async Task Ping()
+        {
+            await Clients.Caller.SendAsync("Pong", DateTime.UtcNow);
         }
     }
 }
